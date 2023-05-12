@@ -1,0 +1,10 @@
+{
+  "files": {
+    "main.js": "/coinsite/static/js/main.acb28441.js",
+    "index.html": "/coinsite/index.html",
+    "main.acb28441.js.map": "/coinsite/static/js/main.acb28441.js.map"
+  },
+  "entrypoints": [
+    "static/js/main.acb28441.js"
+  ]
+}
