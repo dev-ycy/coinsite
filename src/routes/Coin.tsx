@@ -1,4 +1,10 @@
-import { useLocation, useParams } from "react-router-dom";
+import {
+  Link,
+  Outlet,
+  useLocation,
+  useMatch,
+  useParams,
+} from "react-router-dom";
 import styled from "styled-components";
 import { useQuery } from "@tanstack/react-query";
 import { fetchCoinInfo, fetchCoinTickers } from "../api";
@@ -59,6 +65,37 @@ const OverviewItem = styled.div`
   }
   p {
     line-height: 1.5;
+  }
+`;
+
+const TabContainer = styled.div`
+  display: flex;
+  justify-content: space-around;
+  margin: 0.75rem 0;
+`;
+
+const Tab = styled.div<{ isActive: boolean }>`
+  display: flex;
+  width: 100%;
+  position: relative;
+  margin-bottom: 2rem;
+  font-weight: ${(props) => (props.isActive ? 700 : 400)};
+  color: ${(props) =>
+    props.isActive ? props.theme.accentColor : props.theme.textColor};
+  /* transition: color 0.2s ease-in; */
+  &::after {
+    content: "";
+    position: absolute;
+    /* display: block; */
+    /* width: 1.5rem; */
+    /* width: 100%; */
+    height: 0.15rem;
+    left: 0.2rem;
+    right: 0.2rem;
+    bottom: -0.75rem;
+    opacity: ${(props) => (props.isActive ? 1 : 0.6)};
+    background: ${(props) =>
+      props.isActive ? props.theme.accentColor : props.theme.textColor};
   }
 `;
 
@@ -128,8 +165,8 @@ export default function Coin() {
     ["tickers", coinId],
     () => fetchCoinTickers(coinId)
   );
-  console.log("infoData", infoData);
-  console.log("tickersData", tickersData);
+  const priceMatch = useMatch("/coin/:coinId/price");
+  const chartMatch = useMatch("/coin/:coinId/chart");
 
   const isLoading = infoLoading || tickersLoading;
 
@@ -169,11 +206,23 @@ export default function Coin() {
               <span>{tickersData?.max_supply}</span>
             </OverviewItem>
           </Overview>
-          <Overview>
-            <OverviewItem>
-              <p>{infoData?.description}</p>
-            </OverviewItem>
-          </Overview>
+          {infoData?.description ? (
+            <Overview>
+              <OverviewItem>
+                <p>{infoData?.description}</p>
+              </OverviewItem>
+            </Overview>
+          ) : null}
+
+          <TabContainer>
+            <Link to="price">
+              <Tab isActive={priceMatch !== null}>Price</Tab>
+            </Link>
+            <Link to="chart">
+              <Tab isActive={chartMatch !== null}>Chart</Tab>
+            </Link>
+          </TabContainer>
+          <Outlet context={{ coinId }} />
         </DetailContainer>
       )}
     </Container>

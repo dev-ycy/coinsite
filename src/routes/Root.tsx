@@ -1,3 +1,4 @@
+import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 import { Outlet } from "react-router-dom";
 import { createGlobalStyle, ThemeProvider } from "styled-components";
 import { lightTheme } from "../theme";
@@ -73,6 +74,7 @@ export default function Root() {
     <ThemeProvider theme={lightTheme}>
       <GlobalStyle />
       <Outlet />
+      <ReactQueryDevtools />
     </ThemeProvider>
   );
 }
