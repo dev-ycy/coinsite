@@ -1,7 +1,10 @@
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
+import { MdDarkMode, MdLightMode } from "react-icons/md";
 import { Outlet } from "react-router-dom";
-import { createGlobalStyle, ThemeProvider } from "styled-components";
-import { lightTheme } from "../theme";
+import { useRecoilValue, useSetRecoilState } from "recoil";
+import styled, { createGlobalStyle, ThemeProvider } from "styled-components";
+import { isDarkAtom } from "../atoms";
+import { lightTheme, darkTheme } from "../theme";
 
 // createGlobalStyle : 랜더링 시, 이 컴포넌트는 전역 스코프에 스타일을 올려줌
 const GlobalStyle = createGlobalStyle`
@@ -69,9 +72,36 @@ const GlobalStyle = createGlobalStyle`
   }
 `;
 
+const ToggleTheme = styled.button`
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: fixed;
+  top: 1rem;
+  right: 1rem;
+  width: 3rem;
+  height: 3rem;
+  font-size: 1.5rem;
+  border: none;
+  border-radius: 50%;
+  background-color: ${(props) => props.theme.cardColor};
+  color: ${(props) => props.theme.accentColor};
+  box-shadow: 0 0.2rem 0.5rem rgba(10, 10, 10, 0.1);
+  transition: background-color 0.3s;
+  cursor: pointer;
+`;
+
 export default function Root() {
+  const isDark = useRecoilValue(isDarkAtom);
+  const setIsDark = useSetRecoilState(isDarkAtom);
+  const onClick = () => {
+    setIsDark((prev) => !prev);
+  };
   return (
-    <ThemeProvider theme={lightTheme}>
+    <ThemeProvider theme={isDark ? darkTheme : lightTheme}>
+      <ToggleTheme onClick={onClick}>
+        {isDark ? <MdLightMode /> : <MdDarkMode />}
+      </ToggleTheme>
       <GlobalStyle />
       <Outlet />
       <ReactQueryDevtools />

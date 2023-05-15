@@ -1,4 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
+import { Helmet } from "react-helmet";
 import { Link } from "react-router-dom";
 import styled from "styled-components";
 import { fetchCoins } from "../api";
@@ -33,7 +34,7 @@ const Coin = styled.li`
   align-items: center;
   height: 4rem;
   width: 100%;
-  background-color: white;
+  background-color: ${(props) => props.theme.cardColor};
   color: ${(props) => props.theme.textColor};
   font-size: 1.5rem;
   font-weight: 500;
@@ -79,6 +80,9 @@ export default function Coins() {
 
   return (
     <Container>
+      <Helmet>
+        <title>Coins</title>
+      </Helmet>
       <Header>
         <Title>Coins</Title>
       </Header>
@@ -88,7 +92,7 @@ export default function Coins() {
         <CoinsList>
           {data?.slice(0, 100).map((coin) => (
             <Coin key={coin.id}>
-              <Link to={`coin/${coin.id}`} state={{ name: coin.name }}>
+              <Link to={`${coin.id}`} state={{ name: coin.name }}>
                 <Img
                   src={`https://cryptocurrencyliveprices.com/img/${coin.id}.png`}
                   onError={(i) =>

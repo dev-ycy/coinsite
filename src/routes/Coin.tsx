@@ -8,6 +8,8 @@ import {
 import styled from "styled-components";
 import { useQuery } from "@tanstack/react-query";
 import { fetchCoinInfo, fetchCoinTickers } from "../api";
+import { Helmet } from "react-helmet";
+import { MdKeyboardArrowLeft } from "react-icons/md";
 
 const Container = styled.div`
   padding: 0 2rem;
@@ -20,6 +22,16 @@ const Header = styled.header`
   display: flex;
   justify-content: center;
   align-items: center;
+  position: relative;
+`;
+
+const Btn = styled.div`
+  font-size: 2.5rem;
+  position: absolute;
+  left: 1rem;
+  a {
+    display: block;
+  }
 `;
 
 const Title = styled.header`
@@ -46,7 +58,7 @@ const Overview = styled.div`
   /* width: 100%; */
   /* height: 5rem; */
   padding: 1rem; // width, height 대신 이렇게!
-  background-color: white;
+  background-color: ${(props) => props.theme.cardColor};
   margin-bottom: 1rem;
   border-radius: 1rem;
   box-shadow: 0 0.2rem 0.5rem rgba(10, 10, 10, 0.1);
@@ -120,7 +132,7 @@ interface IInfoData {
   last_data_at: string;
 }
 
-interface IPriceData {
+export interface IPriceData {
   id: string;
   name: string;
   symbol: string;
@@ -163,16 +175,30 @@ export default function Coin() {
   );
   const { isLoading: tickersLoading, data: tickersData } = useQuery<IPriceData>(
     ["tickers", coinId],
-    () => fetchCoinTickers(coinId)
+    () => fetchCoinTickers(coinId),
+    {
+      // refetchInterval: 5000,  // FIXME: 배포 전에 수정하기
+    }
   );
-  const priceMatch = useMatch("/coin/:coinId/price");
-  const chartMatch = useMatch("/coin/:coinId/chart");
+  const priceMatch = useMatch(`${process.env.PUBLIC_URL}/:coinId/price`);
+  const chartMatch = useMatch(`${process.env.PUBLIC_URL}/:coinId/chart`);
 
   const isLoading = infoLoading || tickersLoading;
 
   return (
     <Container>
+      <Helmet>
+        <title>
+          {state ? state.name : isLoading ? "Loading..." : infoData?.name}
+        </title>
+      </Helmet>
       <Header>
+        <Btn>
+          <Link to={`${process.env.PUBLIC_URL}`}>
+            <MdKeyboardArrowLeft />
+          </Link>
+        </Btn>
+
         <Title>
           {state ? state.name : isLoading ? "Loading..." : infoData?.name}
         </Title>
@@ -222,7 +248,7 @@ export default function Coin() {
               <Tab isActive={chartMatch !== null}>Chart</Tab>
             </Link>
           </TabContainer>
-          <Outlet context={{ coinId }} />
+          <Outlet context={{ coinId, tickersData }} />
         </DetailContainer>
       )}
     </Container>
